@@ -1,0 +1,220 @@
+<html>
+<!-- Mirrored from webpages.charter.net/manauser/morrowind/indenter.htm by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 28 May 2018 08:40:31 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+	
+	<title>Morrowind Script Indenter</title>
+	<script type="text/javascript">
+
+	function Indent()
+	{
+		var Tab = String.fromCharCode(9)
+		var NewLine1 = String.fromCharCode(10)
+		var NewLine2 = String.fromCharCode(13, 10)
+
+		var IndentLevel = 0
+		var AddOne = 0
+		var ScriptOut = ""
+
+		var ScriptIn = document.MyForm.TheScript.value
+		var Lines1 = ScriptIn.split(NewLine1)
+		var Lines2 = ScriptIn.split(NewLine2)
+		var OneLine = ""
+
+			//Determine whether the text field uses CR+LF or use CR
+		if (Lines1.length > Lines2.length)
+		{
+			var Lines = Lines1
+			var NewLine = NewLine1
+		}
+		else
+		{
+			var Lines = Lines2
+			var NewLine = NewLine2
+		}
+
+		var IndentChar = ""
+
+		if (document.MyForm.UseTabs.checked)
+			IndentChar = Tab
+		else
+		{
+			var Spaces = document.MyForm.NumSpace.value
+			for (I = 1; I <= Spaces; I++)
+				IndentChar += " "
+		}
+
+		for (I = 0; I < Lines.length; I++)
+		{
+			OneLine = Lines[I]
+			while (OneLine.substring(0, 1) == " " || OneLine.substring(0, 1) == Tab)
+				OneLine = OneLine.substring(1, OneLine.length)
+
+			AddOne = 0
+
+			if (OneLine.substring(0,3).toUpperCase() == "END")
+				IndentLevel--
+			else if (OneLine.substring(0,4).toUpperCase() == "ELSE")
+			{
+				IndentLevel--
+				AddOne = 1
+			}
+			else if (OneLine.substring(0,2).toUpperCase() == "IF")
+				AddOne = 1
+			else if (OneLine.substring(0,5).toUpperCase() == "WHILE")
+				AddOne = 1
+			else if (OneLine.substring(0,5).toUpperCase() == "BEGIN")
+				AddOne = 1
+
+			if (document.MyForm.Insanity.checked && IndentLevel > 0)
+				OneLine = " " + OneLine
+
+			for (J = 1; J <= IndentLevel; J++)
+				OneLine = IndentChar + OneLine
+
+			for (J = -1; J >= IndentLevel; J--)
+				OneLine = ";ERR" + OneLine
+
+			ScriptOut += OneLine + String.fromCharCode(13, 10)
+
+
+			IndentLevel += AddOne
+		}
+
+		if (Lines.length > 0)
+			ScriptOut = ScriptOut.substring(0, ScriptOut.length - 2)
+
+		if (document.MyForm.CodeTags.checked)
+			ScriptOut = "[CODE]" + ScriptOut + "[/CODE]"
+
+		document.MyForm.TheScript.value = ScriptOut
+	}
+
+
+	function UBB()
+	{
+		document.MyForm.UseSpaces.checked=true
+		document.MyForm.UseTabs.checked=false
+		document.MyForm.Insanity.checked=false
+		document.MyForm.CodeTags.checked=true
+		document.MyForm.NumSpace.value="4"
+	}
+
+	function Editor()
+	{
+		document.MyForm.UseSpaces.checked=false
+		document.MyForm.UseTabs.checked=true
+		document.MyForm.Insanity.checked=false
+		document.MyForm.CodeTags.checked=false
+	}
+
+	</script></head>
+<body bgcolor="#dccda2">
+<P ALIGN=CENTER><B>Be sure to visit my <A HREF="index-2.html">Mod Page</A> too.</B></P>
+	<form name="MyForm" action="#">
+	<table width="666" border="0" align="center">
+	<tbody><tr>
+		<td valign="top" colspan="2">
+			<big><big>Morrowind Script Indenter</big></big><br>
+			(works with Oblivion scripts too)
+		</td>
+		<td valign="top" align="right">
+			by ManaUser
+		</td>
+	</tr>
+	<tr>
+		<td colspan="3">
+			<textarea name="TheScript" cols="80" rows="24"></textarea>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<b>Options:</b>
+		</td>
+		<td colspan="2">
+			(Presets: <a href="javascript:UBB()">Official Forum</a>,
+			<a href="javascript:Editor()">Editor</a>)
+		</td>
+	</tr>
+	<tr>
+		<td width="30%" align="left">
+			<input value="Spaces" checked="checked" name="UseSpaces" type="radio"
+			onclick="document.MyForm.UseTabs.checked=false">Use
+			<input size="2" value="4" name="NumSpace" type="text"> spaces.<br>
+			<input value="Tabs" name="UseTabs" type="radio"
+			onclick="document.MyForm.UseSpaces.checked=false">Use tabs.
+		</td>
+		<td width="30%" align="left">
+			<input name="Insanity" type="checkbox">Extra large first level.<br>
+			<input name="CodeTags" type="checkbox">Add CODE Tags.
+		</td>
+		<td width="40%" valign="top" align="right">
+			<input onclick="Indent()" value="Indent Now" type="button">
+		</td>
+	</tr>
+	<tr>
+		<td colspan="3">
+			<br>
+			So what does this do? It formats scripts to make them more readable.
+			For example, it would turn this:<br>
+<blockquote><pre>begin GiveBonus
+
+if ( GlobalVar == 0 )
+set GlobalVar to 1
+if ( Player-&gt;GetLevel &gt;= 15 )
+Player-&gt;AddSpell "Bonus3"
+elseif ( Player-&gt;GetLevel &lt;= 5 )
+Player-&gt;AddSpell "Bonus1"
+else
+Player-&gt;AddSpell "Bonus2"
+endif
+else
+set GlobalVar to 2
+endif
+StopScript GiveBonus
+
+end</pre></blockquote>
+Into this:
+<blockquote><pre>begin GiveBonus
+
+    if ( GlobalVar == 0 )
+        set GlobalVar to 1
+        if ( Player-&gt;GetLevel &gt;= 15 )
+            Player-&gt;AddSpell "Bonus3"
+        elseif ( Player-&gt;GetLevel &lt;= 5 )
+            Player-&gt;AddSpell "Bonus1"
+        else
+            Player-&gt;AddSpell "Bonus2"
+        endif
+    else
+        set GlobalVar to 2
+    endif
+    StopScript GiveBonus
+
+end</pre></blockquote>
+Just paste your script into the box, adjust the options as needed click
+Indent Now, and copy your script back out.<br><br>
+
+Do you see ;ERR in your script? That means you have more close block
+commands than open block commands. For example too many endifs. Likewise if the last
+line of your script is indented, you have more close blocks than open blocks, just the
+opposite problem.<br><br>
+
+Tip: You can use CTRL+C and CTRL+V to copy and paste in the editor.<br><br>
+Want to use Morrowind Script Indenter offline? Just press CTRL+S to save this page
+on your computer.<br><br>
+
+If you use Firefox, you might also want to check out Yacoby's adaptation of my
+code here as a <a href="http://www.yacoby.net/plugins/index.php#esscriptindent">
+Fixefox&nbsp;Extension</a>. It lets to indent scripts in your forum posts directly
+with a right-click context menu.<br><br>
+
+<small>* Thanks to Dave Humphrey for tweaking the code to work in more browsers.</small><br><br>
+		</td>
+	</tr>
+	</tbody></table>
+	</form>
+
+</body>
+<!-- Mirrored from webpages.charter.net/manauser/morrowind/indenter.htm by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 28 May 2018 08:40:32 GMT -->
+</html>
